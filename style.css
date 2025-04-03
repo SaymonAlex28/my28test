@@ -1,8 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-  -webkit-tap-highlight-color: transparent;
-}
+@import url(https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap);
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif;-webkit-tap-highlight-color:transparent}
+body{text-align:center;font-family:Arial,sans-serif;background-color:#000;color:#fff}
+#micButton{background-color:#e63946;color:#fff;border:none;padding:15px;border-radius:50%;cursor:pointer;font-size:20px;margin-top:20px}
+#micButton:active{background-color:#d62828}

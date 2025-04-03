@@ -3,18 +3,18 @@ function speak() {
   var utterance = new SpeechSynthesisUtterance(text);
   speechSynthesis.speak(utterance);
 }
-// Проверяем поддержку браузером API распознавания речи
+// Проверяем поддержку API распознавания речи
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
 
-recognition.lang = "ru-RU"; // Устанавливаем язык на русский
-recognition.continuous = true; // Постоянное прослушивание
-recognition.interimResults = false; // Не показывать промежуточные результаты
+recognition.lang = "ru-RU"; // Русский язык
+recognition.continuous = false; // Одноразовое прослушивание
+recognition.interimResults = false; // Только финальный результат
 
-// Функция, выполняемая при распознавании речи
+// Функция обработки распознанного текста
 recognition.onresult = function (event) {
-  const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-  console.log("Распознано:", command); // Вывод в консоль (можно убрать)
+  const command = event.results[0][0].transcript.trim().toLowerCase();
+  console.log("Распознано:", command);
 
   if (command.includes("включить свет")) {
     turnOnLight();
@@ -26,27 +26,17 @@ recognition.onresult = function (event) {
 // Функция включения света
 function turnOnLight() {
   document.body.style.backgroundColor = "yellow"; // Фон жёлтый
-  document.body.style.color = "black"; // Текст чёрный для контраста
+  document.body.style.color = "black"; // Текст чёрный
 }
 
 // Функция выключения света
 function turnOffLight() {
   document.body.style.backgroundColor = "black"; // Фон чёрный
-  document.body.style.color = "white"; // Текст белый для контраста
+  document.body.style.color = "white"; // Текст белый
 }
 
-// Запуск распознавания речи
-function startVoiceControl() {
+// Запуск прослушивания по нажатию на кнопку
+document.getElementById("micButton").addEventListener("click", function () {
   recognition.start();
-  console.log("Голосовое управление включено...");
-}
-
-// Остановка прослушивания
-function stopVoiceControl() {
-  recognition.stop();
-  console.log("Голосовое управление отключено...");
-}
-
-// Автоматический запуск голосового управления
-startVoiceControl();
-
+  console.log("Голосовое управление активировано...");
+});
