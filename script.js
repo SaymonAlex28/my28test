@@ -1,16 +1,46 @@
 let isListening = false;
 let recognition;
 
+// function speak(text) {
+//   const utterance = new SpeechSynthesisUtterance(text);
+//   const voices = speechSynthesis.getVoices();
+//   const russianVoice = voices.find(voice => voice.lang === 'ru-RU');
+//   if (russianVoice) utterance.voice = russianVoice;
+
+//   utterance.pitch = 1;
+//   utterance.rate = 0.95;
+//   speechSynthesis.speak(utterance);
+// }
+
 function speak(text) {
   const utterance = new SpeechSynthesisUtterance(text);
   const voices = speechSynthesis.getVoices();
-  const russianVoice = voices.find(voice => voice.lang === 'ru-RU');
-  if (russianVoice) utterance.voice = russianVoice;
+
+  // Найти мужской голос на русском (если доступен)
+  const russianMaleVoice = voices.find(voice =>
+    voice.lang === 'ru-RU' &&
+    (voice.name.toLowerCase().includes("male") ||
+      voice.name.toLowerCase().includes("иван") ||
+      voice.name.toLowerCase().includes("alexey") ||
+      voice.name.toLowerCase().includes("maksim") ||
+      voice.name.toLowerCase().includes("mikhail") ||
+      voice.name.toLowerCase().includes("google русский мужской"))
+  );
+
+  const fallbackRussian = voices.find(voice => voice.lang === 'ru-RU');
+
+  utterance.voice = russianMaleVoice || fallbackRussian;
 
   utterance.pitch = 1;
   utterance.rate = 0.95;
   speechSynthesis.speak(utterance);
 }
+
+
+speechSynthesis.onvoiceschanged = () => {
+  const voices = speechSynthesis.getVoices();
+  console.log("Доступные голоса:", voices);
+};
 
 // Настройка распознавания речи
 function initRecognition() {
@@ -30,6 +60,8 @@ function initRecognition() {
       speak("Окей, выключаю микрофон.");
       isListening = false;
       recognition.stop();
+      document.getElementById('toggle-btn').textContent = "▶️ Включить микрофон";
+      document.getElementById('status').textContent = "⏸️ Прослушка остановлена.";
     }else{
       speak("Извините, я не понял ваш запрос.");
     }
