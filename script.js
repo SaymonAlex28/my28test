@@ -86,12 +86,12 @@ document.getElementById('toggle-btn').addEventListener('click', function () {
     isListening = true;
     waitingForCommand = false;
     recognition.start();
-    document.getElementById('toggle-btn').textContent = "⏹️ Остановить Джарвиса";
-    document.getElementById('status').textContent = "🎤 Скажите: Джарвис...";
+    document.getElementById('toggle-btn').textContent = "⏹️ Остановить Алису";
+    document.getElementById('status').textContent = "🎤 Скажите: Алиса...";
   } else {
     isListening = false;
     recognition.stop();
-    document.getElementById('toggle-btn').textContent = "▶️ Включить Джарвиса";
+    document.getElementById('toggle-btn').textContent = "▶️ Включить Алису";
     document.getElementById('status').textContent = "⏸️ Прослушка остановлена.";
   }
 });
