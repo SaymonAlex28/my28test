@@ -39,9 +39,10 @@ function initRecognition() {
     }
 
     // === Основные команды ===
-    const tempMatch = transcript.match(/(установи(ть)?|поставь) температуру\s?(\d+[.,]?\d*)/);
+    const tempMatch = transcript.match(/(установи(ть)?|поставь|задай|измени|поставить)\s+(температуру\s*)?(\d+[.,]?\d*)/);
     if (tempMatch) {
-      let temp = tempMatch[3].replace(",", ".");
+      let temp = tempMatch[4] || tempMatch[3]; // поддержка разных форм записи
+      temp = temp.replace(",", "."); // заменим запятую на точку
       temp = parseFloat(temp).toFixed(1);
       speak(`Температура установлена на ${temp} градусов.`);
       document.getElementById('status').textContent = `Установлена температура: ${temp} °C`;
