@@ -27,12 +27,12 @@ function initRecognition() {
     document.getElementById('status').textContent = `Вы сказали: "${transcript}"`;
 
     if (!waitingForCommand) {
-      if (transcript.includes("джарвис")) {
+      if (transcript.includes("алиса")) {
         speak("Слушаю вас.");
         waitingForCommand = true;
         restartRecognition();
       } else {
-        document.getElementById('status').textContent = `Ожидаю имя "Джарвис"...`;
+        document.getElementById('status').textContent = `Ожидаю имя "Алиса"...`;
         restartRecognition();
       }
       return;
@@ -51,11 +51,11 @@ function initRecognition() {
       speak("Окей, выключаю микрофон.");
       isListening = false;
       recognition.stop();
-      document.getElementById('toggle-btn').textContent = "▶️ Включить Джарвиса";
+      document.getElementById('toggle-btn').textContent = "▶️ Включить Алису";
       document.getElementById('status').textContent = "⏸️ Прослушка остановлена.";
       return;
     } else {
-      speak("Извините, я не понял ваш запрос.");
+      speak("Извините, я не поняла ваш запрос.");
     }
 
     waitingForCommand = false;
