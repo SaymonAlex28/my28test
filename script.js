@@ -39,13 +39,13 @@ function initRecognition() {
     }
 
     // === Основные команды ===
-    const tempMatch = transcript.match(/установи(ть)? температуру\s?(\d+[.,]?\d*)/);
+    const tempMatch = transcript.match(/(установи(ть)?|поставь) температуру\s?(\d+[.,]?\d*)/);
     if (tempMatch) {
-      let temp = tempMatch[2].replace(",", ".");
+      let temp = tempMatch[3].replace(",", ".");
       temp = parseFloat(temp).toFixed(1);
       speak(`Температура установлена на ${temp} градусов.`);
       document.getElementById('status').textContent = `Установлена температура: ${temp} °C`;
-    } else if (transcript.includes("как дела")) {
+    }else if (transcript.includes("как дела")) {
       speak("Отлично, жду ваших указаний.");
     } else if (transcript.includes("выключи микрофон")) {
       speak("Окей, выключаю микрофон.");
