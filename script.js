@@ -54,18 +54,26 @@ function initRecognition() {
     const transcript = event.results[0][0].transcript.trim().toLowerCase();
     document.getElementById('status').textContent = `Вы сказали: "${transcript}"`;
 
+    const tempMatch = transcript.match(/установи температуру\s(\d+[.,]?\d*)/);
+
     if (transcript.includes("привет джарвис") && transcript.includes("как дела")) {
       speak("Отлично, жду ваших указаний.");
-    }else if(transcript.includes("джарвис") && transcript.includes("выключи микрофон")) {
+    } else if (transcript.includes("джарвис") && transcript.includes("выключи микрофон")) {
       speak("Окей, выключаю микрофон.");
       isListening = false;
       recognition.stop();
       document.getElementById('toggle-btn').textContent = "▶️ Включить микрофон";
       document.getElementById('status').textContent = "⏸️ Прослушка остановлена.";
-    }else{
+    } else if (tempMatch) {
+      let temp = tempMatch[1].replace(",", ".");
+      temp = parseFloat(temp).toFixed(1);
+      speak(`Температура установлена на ${temp} градусов.`);
+      document.getElementById('status').textContent = `Установлена температура: ${temp} °C`;
+    } else {
       speak("Извините, я не понял ваш запрос.");
     }
   };
+  
 
   recognition.onerror = function (event) {
     console.error("Ошибка:", event.error);
