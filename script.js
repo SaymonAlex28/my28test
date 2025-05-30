@@ -1,48 +1,57 @@
-if (!('webkitSpeechRecognition' in window)) {
-  alert("Ваш браузер не поддерживает распознавание речи. Попробуйте Google Chrome.");
-} else {
-  const recognition = new webkitSpeechRecognition();
+function speak(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  const voices = speechSynthesis.getVoices();
+  const russianVoice = voices.find(voice => voice.lang === 'ru-RU');
+
+  if (russianVoice) {
+    utterance.voice = russianVoice;
+  }
+
+  utterance.pitch = 1;
+  utterance.rate = 0.95;
+  speechSynthesis.speak(utterance);
+}
+
+function startListening() {
+  const status = document.getElementById('status');
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    status.textContent = "Ваш браузер не поддерживает распознавание речи.";
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
   recognition.lang = 'ru-RU';
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
-  const button = document.getElementById('startRecognition');
-  const output = document.getElementById('output');
+  status.textContent = "Слушаю...";
 
-  button.addEventListener('click', () => {
-    try {
-      recognition.start();
-      output.textContent = "Говорите, микрофон активирован...";
-    } catch (err) {
-      console.error("Ошибка запуска распознавания:", err);
-      output.textContent = "Ошибка запуска распознавания.";
-    }
-  });
+  recognition.start();
 
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript.toLowerCase();
-    output.textContent = `Вы сказали: ${transcript}`;
+  recognition.onresult = function (event) {
+    const transcript = event.results[0][0].transcript.trim().toLowerCase();
+    status.textContent = `Вы сказали: "${transcript}"`;
 
-    if (transcript.includes('изменить цвет')) {
-      changeBackgroundColor();
+    if (transcript.includes("привет джарвис") && transcript.includes("как дела")) {
+      speak("Отлично, жду ваших указаний.");
     } else {
-      output.textContent += `\nКоманда не распознана. Попробуйте снова.`;
+      speak("Извините, я не понял ваш запрос.");
     }
   };
 
-  recognition.onerror = (event) => {
-    console.error("Ошибка распознавания речи:", event.error);
-    alert("Ошибка распознавания речи: " + event.error);
-    output.textContent = "Произошла ошибка распознавания.";
+  recognition.onerror = function (event) {
+    status.textContent = "Ошибка: " + event.error;
   };
 
-  recognition.onend = () => {
-    output.textContent += "\nРаспознавание завершено.";
+  recognition.onend = function () {
+    status.textContent += " (ожидание завершено)";
   };
-
-  function changeBackgroundColor() {
-    const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-    document.body.style.backgroundColor = randomColor;
-    alert("Цвет фона изменён!");
-  }
 }
+
+// Чтобы голоса загрузились корректно
+speechSynthesis.onvoiceschanged = () => {
+  speechSynthesis.getVoices();
+};
