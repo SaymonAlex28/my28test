@@ -26,7 +26,11 @@ function initRecognition() {
 
     if (transcript.includes("привет джарвис") && transcript.includes("как дела")) {
       speak("Отлично, жду ваших указаний.");
-    } else {
+    }else if(transcript.includes("джарвис") && transcript.includes("выключи микрофон")) {
+      speak("Окей, выключаю микрофон.");
+      isListening = false;
+      recognition.stop();
+    }else{
       speak("Извините, я не понял ваш запрос.");
     }
   };
