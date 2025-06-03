@@ -1,19 +1,47 @@
+<button id="toggle-btn">▶️ Включить Алису</button>
+<div id="status">⏸️ Прослушка остановлена.</div>
+
+<script>
 let isListening = false;
 let recognition;
 let waitingForCommand = false;
+let voicesLoaded = false;
 
-function speak(text) {
-  const utterance = new SpeechSynthesisUtterance(text);
-  const voices = speechSynthesis.getVoices();
-  const russianMaleVoice = voices.find(v => v.lang === 'ru-RU' && v.name.toLowerCase().includes('male' || 'иван')); // подбираем мужской
-  if (russianMaleVoice) utterance.voice = russianMaleVoice;
+// Асинхронная функция для озвучивания
+async function speak(text) {
+  return new Promise((resolve) => {
+    const utterance = new SpeechSynthesisUtterance(text);
 
-  utterance.pitch = 1;
-  utterance.rate = 0.95;
-  speechSynthesis.speak(utterance);
+    const voices = speechSynthesis.getVoices();
+    const russianMaleVoice = voices.find(v =>
+      v.lang === 'ru-RU' && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('иван'))
+    );
+    if (russianMaleVoice) utterance.voice = russianMaleVoice;
+
+    utterance.pitch = 1;
+    utterance.rate = 0.95;
+    utterance.onend = resolve;
+    speechSynthesis.speak(utterance);
+  });
 }
 
-// Инициализация
+// Загрузка голосов
+function loadVoices() {
+  return new Promise((resolve) => {
+    const voices = speechSynthesis.getVoices();
+    if (voices.length) {
+      voicesLoaded = true;
+      resolve();
+    } else {
+      speechSynthesis.onvoiceschanged = () => {
+        voicesLoaded = true;
+        resolve();
+      };
+    }
+  });
+}
+
+// Инициализация распознавания речи
 function initRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
@@ -21,14 +49,14 @@ function initRecognition() {
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
-  recognition.onresult = function (event) {
+  recognition.onresult = async function (event) {
     const transcript = event.results[0][0].transcript.trim().toLowerCase();
     console.log("Распознано:", transcript);
     document.getElementById('status').textContent = `Вы сказали: "${transcript}"`;
 
     if (!waitingForCommand) {
       if (transcript.includes("алиса")) {
-        speak("Слушаю вас.");
+        await speak("Слушаю вас.");
         waitingForCommand = true;
         restartRecognition();
       } else {
@@ -41,26 +69,26 @@ function initRecognition() {
     // === Основные команды ===
     const tempMatch = transcript.match(/(установи(ть)?|поставь|задай|измени|поставить)\s+(температуру\s*)?(\d+[.,]?\d*)/);
     if (tempMatch) {
-      let temp = tempMatch[4] || tempMatch[3]; // поддержка разных форм записи
-      temp = temp.replace(",", "."); // заменим запятую на точку
+      let temp = tempMatch[4] || tempMatch[3];
+      temp = temp.replace(",", ".");
       temp = parseFloat(temp).toFixed(1);
-      speak(`Температура установлена на ${temp} градусов.`);
+      await speak(`Температура установлена на ${temp} градусов.`);
       document.getElementById('status').textContent = `Установлена температура: ${temp} °C`;
-    }else if (transcript.includes("как дела")) {
-      speak("Отлично, жду ваших указаний.");
+    } else if (transcript.includes("как дела")) {
+      await speak("Отлично, жду ваших указаний.");
     } else if (transcript.includes("выключи микрофон")) {
-      speak("Окей, выключаю микрофон.");
+      await speak("Окей, выключаю микрофон.");
       isListening = false;
       recognition.stop();
       document.getElementById('toggle-btn').textContent = "▶️ Включить Алису";
       document.getElementById('status').textContent = "⏸️ Прослушка остановлена.";
       return;
     } else {
-      speak("Извините, я не поняла ваш запрос.");
+      await speak("Извините, я не поняла ваш запрос.");
     }
 
     waitingForCommand = false;
-    restartRecognition(); // снова ждём слово "Джарвис"
+    restartRecognition();
   };
 
   recognition.onerror = function (event) {
@@ -75,13 +103,16 @@ function initRecognition() {
   };
 }
 
+// Перезапуск распознавания
 function restartRecognition() {
   recognition.stop();
   setTimeout(() => recognition.start(), 300);
 }
 
-// Кнопка включения
-document.getElementById('toggle-btn').addEventListener('click', function () {
+// Кнопка управления
+document.getElementById('toggle-btn').addEventListener('click', async function () {
+  if (!voicesLoaded) await loadVoices();
+
   if (!isListening) {
     if (!recognition) initRecognition();
     isListening = true;
@@ -96,8 +127,4 @@ document.getElementById('toggle-btn').addEventListener('click', function () {
     document.getElementById('status').textContent = "⏸️ Прослушка остановлена.";
   }
 });
-
-// Подгрузка голосов
-speechSynthesis.onvoiceschanged = () => {
-  speechSynthesis.getVoices();
-};
+</script>
