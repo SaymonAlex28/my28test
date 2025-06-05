@@ -814,22 +814,7 @@ function togglesnow() {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
 // Управление с помощью микрофона
-
-
-
 let isListening = false;
 let recognition;
 let waitingForCommand = false;
@@ -887,7 +872,16 @@ function initRecognition() {
       document.getElementById('infoContainer').textContent = `Установлена температура на: ${temp} °C`;
     } else if (transcript.includes("как дела")) {
       await speak("Отлично, жду ваших указаний.");
-    } else if (transcript.includes("выключи микрофон")) {
+    } else if (transcript.includes("включи свет")) {
+      let firebaseRef = firebase.database().ref().child("Leavingroomlamp");
+      firebaseRef.set("0");
+      // Leavingroomlamp = "0";
+    } else if (transcript.includes("выключи свет")) {
+      let firebaseRef = firebase.database().ref().child("Leavingroomlamp");
+      firebaseRef.set("0");
+      // Leavingroomlamp = "0";
+    }
+    else if (transcript.includes("выключи микрофон")) {
       await speak("Окей, выключаю микрофон.");
       isListening = false;
       recognition.stop();
@@ -961,17 +955,6 @@ mic_icon.addEventListener("click", () => {
     }
   }
 });
-
-
-
-
-
-
-
-
-
-
-
 
 // Управление звуковым сопровождением
 const sound_icon = document.getElementById('sound_icon');
