@@ -837,6 +837,52 @@ async function speak(text) {
   });
 }
 
+// === Основные команды ===
+const voiceCommands = [
+  {
+    match: (text) => /(установи(ть)?|поставь|задай|измени|поставить)\s+(температуру\s*)?(\d+[.,]?\d*)/.test(text),
+    action: async (text) => {
+      const match = text.match(/(установи(ть)?|поставь|задай|измени|поставить)\s+(температуру\s*)?(\d+[.,]?\d*)/);
+      let temp = match[4] || match[3];
+      temp = temp.replace(",", ".");
+      temp = parseFloat(temp).toFixed(1);
+      firebase.database().ref().child("HeaterSetpoint").set(temp);
+      await speak(`Температура установлена на ${temp} градусов.`);
+    }
+  },
+  {
+    match: (text) => text.includes("как дела"),
+    action: async () => {
+      await speak("Отлично, жду ваших указаний.");
+    }
+  },
+  {
+    match: (text) => text.includes("включи свет"),
+    action: async () => {
+      firebase.database().ref().child("Leavingroomlamp").set("1");
+      await speak("Окей, включаю.");
+    }
+  },
+  {
+    match: (text) => text.includes("выключи свет"),
+    action: async () => {
+      firebase.database().ref().child("Leavingroomlamp").set("0");
+      await speak("Окей, выключаю.");
+    }
+  },
+  {
+    match: (text) => text.includes("выключи микрофон"),
+    action: async () => {
+      await speak("Окей, выключаю микрофон.");
+      isListening = false;
+      recognition.stop();
+      mic_State = "off";
+      localStorage.setItem("mic_State", mic_State);
+      togglemic(mic_State);
+    }
+  }
+];
+
 // Инициализация распознавания речи
 function initRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -859,34 +905,16 @@ function initRecognition() {
       return;
     }
 
-    // === Основные команды ===
-    const tempMatch = transcript.match(/(установи(ть)?|поставь|задай|измени|поставить)\s+(температуру\s*)?(\d+[.,]?\d*)/);
-    if (tempMatch) {
-      let temp = tempMatch[4] || tempMatch[3];
-      temp = temp.replace(",", ".");
-      temp = parseFloat(temp).toFixed(1);
-      let firebaseRef = firebase.database().ref().child("HeaterSetpoint");
-      firebaseRef.set(temp);
-      await speak(`Температура установлена на ${temp} градусов.`);
-    } else if (transcript.includes("как дела")) {
-      await speak("Отлично, жду ваших указаний.");
-    } else if (transcript.includes("включи свет")) {
-      let firebaseRef = firebase.database().ref().child("Leavingroomlamp");
-      firebaseRef.set("1");
-      await speak("Окей, включаю.");
-    } else if (transcript.includes("выключи свет")) {
-      let firebaseRef = firebase.database().ref().child("Leavingroomlamp");
-      firebaseRef.set("0");
-      await speak("Окей, выключаю.");
-    } else if (transcript.includes("выключи микрофон")) {
-      await speak("Окей, выключаю микрофон.");
-      isListening = false;
-      recognition.stop();
-      mic_State = "off";
-      localStorage.setItem("mic_State", mic_State);
-      togglemic(mic_State);
-      return;
-    } else {
+    let handled = false;
+    for (const command of voiceCommands) {
+      if (command.match(transcript)) {
+        await command.action(transcript);
+        handled = true;
+        break;
+      }
+    }
+
+    if (!handled) {
       await speak("Извините, я не поняла ваш запрос.");
     }
 
@@ -906,7 +934,6 @@ function restartRecognition() {
   recognition.onend = () => recognition.start();
   recognition.stop();
 }
-
 
 // Кнопка управления
 const mic_icon = document.getElementById('mic_icon');
