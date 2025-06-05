@@ -874,14 +874,12 @@ function initRecognition() {
       await speak("Отлично, жду ваших указаний.");
     } else if (transcript.includes("включи свет")) {
       let firebaseRef = firebase.database().ref().child("Leavingroomlamp");
-      firebaseRef.set("0");
+      firebaseRef.set("1");
       await speak("Окей, включаю.");
-      // Leavingroomlamp = "0";
     } else if (transcript.includes("выключи свет")) {
       let firebaseRef = firebase.database().ref().child("Leavingroomlamp");
-      firebaseRef.set("1");
+      firebaseRef.set("0");
       await speak("Окей, выключаю.");
-      // Leavingroomlamp = "0";
     } else if (transcript.includes("выключи микрофон")) {
       await speak("Окей, выключаю микрофон.");
       isListening = false;
