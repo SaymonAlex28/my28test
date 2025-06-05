@@ -868,8 +868,11 @@ function initRecognition() {
       let temp = tempMatch[4] || tempMatch[3];
       temp = temp.replace(",", ".");
       temp = parseFloat(temp).toFixed(1);
+      let firebaseRef = firebase.database().ref().child("HeaterSetpoint");
+      firebaseRef.set(temp);
       await speak(`Температура установлена на ${temp} градусов.`);
-      document.getElementById('infoContainer').textContent = `Установлена температура на: ${temp} °C`;
+      showInfoMessage("Настройки сохранены успешно");
+      // document.getElementById('infoContainer').textContent = `Установлена температура на: ${temp} °C`;
     } else if (transcript.includes("как дела")) {
       await speak("Отлично, жду ваших указаний.");
     } else if (transcript.includes("включи свет")) {
