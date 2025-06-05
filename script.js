@@ -879,7 +879,7 @@ function initRecognition() {
       // Leavingroomlamp = "0";
     } else if (transcript.includes("выключи свет")) {
       let firebaseRef = firebase.database().ref().child("Leavingroomlamp");
-      firebaseRef.set("0");
+      firebaseRef.set("1");
       await speak("Окей, выключаю.");
       // Leavingroomlamp = "0";
     } else if (transcript.includes("выключи микрофон")) {
