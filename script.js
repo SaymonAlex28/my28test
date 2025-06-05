@@ -847,8 +847,6 @@ function initRecognition() {
 
   recognition.onresult = async function (event) {
     const transcript = event.results[0][0].transcript.trim().toLowerCase();
-    console.log("Распознано:", transcript);
-    document.getElementById('infoContainer').textContent = `Вы сказали: "${transcript}"`;
 
     if (!waitingForCommand) {
       if (transcript.includes("алиса")) {
@@ -856,7 +854,6 @@ function initRecognition() {
         waitingForCommand = true;
         restartRecognition();
       } else {
-        document.getElementById('infoContainer').textContent = `Ожидаю имя "Алиса"...`;
         restartRecognition();
       }
       return;
@@ -871,8 +868,6 @@ function initRecognition() {
       let firebaseRef = firebase.database().ref().child("HeaterSetpoint");
       firebaseRef.set(temp);
       await speak(`Температура установлена на ${temp} градусов.`);
-      showInfoMessage("Настройки сохранены успешно");
-      // document.getElementById('infoContainer').textContent = `Установлена температура на: ${temp} °C`;
     } else if (transcript.includes("как дела")) {
       await speak("Отлично, жду ваших указаний.");
     } else if (transcript.includes("включи свет")) {
@@ -899,11 +894,6 @@ function initRecognition() {
     restartRecognition();
   };
 
-  recognition.onerror = function (event) {
-    console.error("Ошибка:", event.error);
-    document.getElementById('infoContainer').textContent = `Ошибка: ${event.error}`;
-  };
-
   recognition.onend = function () {
     if (isListening) {
       recognition.start();
@@ -913,9 +903,10 @@ function initRecognition() {
 
 // Перезапуск распознавания
 function restartRecognition() {
+  recognition.onend = () => recognition.start();
   recognition.stop();
-  setTimeout(() => recognition.start(), 300);
 }
+
 
 // Кнопка управления
 const mic_icon = document.getElementById('mic_icon');
