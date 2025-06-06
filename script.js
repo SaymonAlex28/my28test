@@ -980,7 +980,7 @@ function togglemic(state) {
   } else {
     mic_icon.src = "mic_off.png"; // Путь к выключенной иконке
     isListening = false;
-    recognition.stop();
+    if (recognition) recognition.stop(); // <-- Только если уже инициализирован
   }
 };
 
