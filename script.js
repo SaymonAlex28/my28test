@@ -848,7 +848,7 @@ const voiceCommands = [
       let temp = match[4].replace(",", ".");
       temp = parseFloat(temp);
 
-      // === 🔒 Ограничения температуры ===
+      // === Ограничения температуры ===
       if (temp < 18) {
         await speak("Температура не может быть ниже 18 градусов.");
         return;
@@ -888,14 +888,14 @@ const voiceCommands = [
   {
     match: (text) => text.includes("включи гирлянду"),
     action: async () => {
-      firebase.database().ref().child("Bedroomlamp").set("1");
+      firebase.database().ref().child("Bedroomlamp").set("0");
       await speak("Окей, включаю.");
     }
   },
   {
     match: (text) => text.includes("выключи гирлянду"),
     action: async () => {
-      firebase.database().ref().child("Bedroomlamp").set("0");
+      firebase.database().ref().child("Bedroomlamp").set("1");
       await speak("Окей, выключаю.");
     }
   },
