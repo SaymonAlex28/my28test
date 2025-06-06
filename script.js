@@ -899,6 +899,12 @@ const voiceCommands = [
       await speak("Окей, выключаю.");
     }
   },
+{
+  match: (text) => text.includes("какая температура в доме"),
+    action: async () => {
+      await speak("средняя температура в доме," + Deviation_temp + "градусов");
+    }
+},
   {
     match: (text) => text.includes("выключи микрофон"),
     action: async () => {
