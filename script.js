@@ -960,9 +960,13 @@ function initRecognition() {
 
 // Перезапуск распознавания
 function restartRecognition() {
-  recognition.onend = () => recognition.start();
-  recognition.stop();
+  if (!recognition) return;
+  recognition.abort();
+  setTimeout(() => {
+    if (isListening) recognition.start();
+  }, 300);
 }
+
 
 // Кнопка управления
 const mic_icon = document.getElementById('mic_icon');
@@ -976,7 +980,7 @@ function togglemic(state) {
   } else {
     mic_icon.src = "mic_off.png"; // Путь к выключенной иконке
     isListening = false;
-    // recognition.stop();
+    recognition.stop();
   }
 };
 
