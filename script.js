@@ -872,16 +872,30 @@ const voiceCommands = [
     }
   },
   {
-    match: (text) => text.includes("включи свет"),
+    match: (text) => text.includes("включи лампу в спальне"),
     action: async () => {
       firebase.database().ref().child("Leavingroomlamp").set("1");
       await speak("Окей, включаю.");
     }
   },
   {
-    match: (text) => text.includes("выключи свет"),
+    match: (text) => text.includes("выключи лампу в спальне"),
     action: async () => {
       firebase.database().ref().child("Leavingroomlamp").set("0");
+      await speak("Окей, выключаю.");
+    }
+  },
+  {
+    match: (text) => text.includes("включи гирлянду"),
+    action: async () => {
+      firebase.database().ref().child("Bedroomlamp").set("0");
+      await speak("Окей, включаю.");
+    }
+  },
+  {
+    match: (text) => text.includes("выключи гирлянду"),
+    action: async () => {
+      firebase.database().ref().child("Bedroomlamp").set("1");
       await speak("Окей, выключаю.");
     }
   },
