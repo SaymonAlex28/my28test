@@ -843,12 +843,27 @@ const voiceCommands = [
     match: (text) => /(установи(ть)?|поставь|задай|измени|поставить)\s+(температуру\s*)?(\d+[.,]?\d*)/.test(text),
     action: async (text) => {
       const match = text.match(/(установи(ть)?|поставь|задай|измени|поставить)\s+(температуру\s*)?(\d+[.,]?\d*)/);
-      let temp = match[4] || match[3];
-      temp = temp.replace(",", ".");
-      temp = parseFloat(temp).toFixed(1);
-      firebase.database().ref().child("HeaterSetpoint").set(temp);
-      await speak(`Температура установлена на ${temp} градусов.`);
+      if (!match) return;
+
+      let temp = match[4].replace(",", ".");
+      temp = parseFloat(temp);
+
+      // === 🔒 Ограничения температуры ===
+      if (temp < 18) {
+        await speak("Температура не может быть ниже 18 градусов.");
+        return;
+      }
+
+      if (temp > 30) {
+        await speak("Температура не может быть выше 30 градусов.");
+        return;
+      }
+
+      const roundedTemp = temp.toFixed(1);
+      firebase.database().ref().child("HeaterSetpoint").set(roundedTemp);
+      await speak(`Температура установлена на ${roundedTemp} градусов.`);
     }
+    
   },
   {
     match: (text) => text.includes("как дела"),
